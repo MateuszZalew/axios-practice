@@ -1,8 +1,26 @@
-import SingleItem from './SingleItem';
-const Items = ({ items }) => {
+import { useQuery } from "@tanstack/react-query";
+import SingleItem from "./SingleItem";
+import customInstance from "./utils";
+
+const Items = () => {
+  const { isLoading, data, error, isError } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: async () => {
+      const { data } = await customInstance.get("/");
+      return data;
+    },
+  });
+  if (isLoading) {
+    return <p style={{ marginTop: "1rem" }}>Loading...</p>;
+  }
+
+  if (isError) {
+    return <p style={{ marginTop: "1rem" }}>{error.response.data}</p>;
+  }
+
   return (
-    <div className='items'>
-      {items.map((item) => {
+    <div className="items">
+      {data.taskList.map((item) => {
         return <SingleItem key={item.id} item={item} />;
       })}
     </div>
